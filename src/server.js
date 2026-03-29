@@ -45,8 +45,8 @@ app.use((err, req, res, next) => {
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('✅ MongoDB conectado');
-    app.listen(process.env.PORT || 3000, () => {
-      console.log(`🚀 Servidor en puerto ${process.env.PORT || 3000}`);
+    app.listen(process.env.PORT || 8080, () => {
+      console.log(`🚀 Servidor en puerto ${process.env.PORT || 8080}`);
     });
   })
   .catch(err => {
