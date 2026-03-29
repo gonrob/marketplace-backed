@@ -26,22 +26,55 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['buyer', 'seller'],
     default: 'buyer'
+  },
+  nombre: {
+    type: String,
+    default: ''
+  },
+  bio: {
+    type: String,
+    default: ''
+  },
+  foto: {
+    type: String,
+    default: ''
+  },
+  precio: {
+    type: Number,
+    default: 10
+  },
+  habilidades: {
+    type: [String],
+    default: []
+  },
+  ciudad: {
+    type: String,
+    default: ''
+  },
+  idiomas: {
+    type: [String],
+    default: ['Español']
+  },
+  verificado: {
+    type: Boolean,
+    default: false
+  },
+  disponible: {
+    type: Boolean,
+    default: true
   }
 }, { timestamps: true });
 
-// Hash password antes de guardar
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-// Comparar password
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// No devolver password en JSON
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;
