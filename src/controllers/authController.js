@@ -5,11 +5,20 @@ const token = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d'
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, password, role, nombre, telefono, ciudad, pais, metodoPago, cuentaPago } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email y password requeridos.' });
     const exists = await User.findOne({ email });
     if (exists) return res.status(409).json({ error: 'Email ya registrado.' });
-    const user = await User.create({ email, password, role: role || 'buyer' });
+    const user = await User.create({
+      email, password,
+      role: role || 'buyer',
+      nombre: nombre || '',
+      telefono: telefono || '',
+      ciudad: ciudad || '',
+      pais: pais || '',
+      metodoPago: metodoPago || '',
+      cuentaPago: cuentaPago || ''
+    });
     res.status(201).json({ token: token(user._id), user });
   } catch (err) {
     console.error(err);

@@ -9,7 +9,7 @@ exports.createSellerAccount = async (req, res) => {
     const user = req.user;
     if (user.stripeAccountId) return res.status(400).json({ error: 'Ya tenes cuenta de vendedor.' });
     const account = await stripe().accounts.create({
-      type: 'express', country: 'ES', email: user.email,
+      type: 'express', country: 'AR', email: user.email,
       capabilities: { card_payments: { requested: true }, transfers: { requested: true } }
     });
     user.stripeAccountId = account.id;

@@ -14,7 +14,11 @@ const userSchema = new mongoose.Schema({
   precio:             { type: Number, default: 10 },
   habilidades:        { type: [String], default: [] },
   ciudad:             { type: String, default: '' },
-  disponible:         { type: Boolean, default: true }
+  disponible:         { type: Boolean, default: true },
+  telefono:           { type: String, default: '' },
+  pais:               { type: String, default: '' },
+  metodoPago:         { type: String, default: '' },
+  cuentaPago:         { type: String, default: '' }
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {
