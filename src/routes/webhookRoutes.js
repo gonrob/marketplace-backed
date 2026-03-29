@@ -1,6 +1,4 @@
 const router = require('express').Router();
-const controller = require('../controllers/webhookController');
-
-router.post('/', controller.handleWebhook);
-
+const ctrl = require('../controllers/webhookController');
+router.post('/', ctrl.handleWebhook);
 module.exports = router;

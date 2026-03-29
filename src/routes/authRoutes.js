@@ -1,9 +1,8 @@
-const router = require('express').Router();
-const controller = require('../controllers/authController');
+// authRoutes.js
+const authRouter = require('express').Router();
 const auth = require('../middleware/auth');
-
-router.post('/register', controller.register);
-router.post('/login',    controller.login);
-router.get('/me',        auth, controller.me);
-
-module.exports = router;
+const authCtrl = require('../controllers/authController');
+authRouter.post('/register', authCtrl.register);
+authRouter.post('/login', authCtrl.login);
+authRouter.get('/me', auth, authCtrl.me);
+module.exports = authRouter;
