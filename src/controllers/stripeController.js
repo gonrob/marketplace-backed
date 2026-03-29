@@ -1,6 +1,7 @@
 const stripeService = require('../services/stripeService');
 const User = require('../models/User');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+const getStripe = () => require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 exports.createSellerAccount = async (req, res) => {
   try {
@@ -66,7 +67,7 @@ exports.getStatus = async (req, res) => {
 exports.createVerification = async (req, res) => {
   try {
     const user = req.user;
-    const session = await stripe.identity.verificationSessions.create({
+    const session = await getStripe().identity.verificationSessions.create({
       type: 'document',
       metadata: { userId: user._id.toString() },
       options: {
