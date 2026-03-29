@@ -22,7 +22,7 @@ exports.createAccountLink = async (accountId, clientUrl) => {
 };
 
 exports.createPaymentIntent = async (amount, destinationAccountId) => {
-  const fee = Math.floor(amount * 0.10); // 10% comisión plataforma
+  const fee = Math.floor(amount * 0.15); // 15% comisión plataforma
   return await stripe.paymentIntents.create({
     amount,
     currency: 'eur',
