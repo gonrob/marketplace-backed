@@ -25,19 +25,41 @@ exports.handleWebhook = async (req, res) => {
     if (event.type === 'payment_intent.succeeded') {
       const intent = event.data.object;
       const sellerAccountId = intent.transfer_data?.destination;
+
       if (sellerAccountId) {
         const totalCents = intent.amount;
         const gananciasCents = Math.floor(totalCents * 0.85);
         const gananciasUSD = gananciasCents / 100;
-        await User.findOneAndUpdate(
+
+        const seller = await User.findOneAndUpdate(
           { stripeAccountId: sellerAccountId },
-          {
-            $inc: {
-              ganancias: gananciasUSD,
-              totalContactos: 1
-            }
-          }
+          { $inc: { ganancias: gananciasUSD, totalContactos: 1 } },
+          { new: true }
         );
+
+        if (seller && seller.cuentaPago && seller.metodoPago === 'mercadopago') {
+          try {
+            const mpResponse = await fetch('https://api.mercadopago.com/v1/payments', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+                'X-Idempotency-Key': intent.id
+              },
+              body: JSON.stringify({
+                transaction_amount: gananciasUSD,
+                currency_id: 'USD',
+                description: `Pago Argentalk - Contacto #${seller.totalContactos}`,
+                payment_method_id: 'account_money',
+                payer: { email: seller.cuentaPago }
+              })
+            });
+            const mpData = await mpResponse.json();
+            console.log('MP pago enviado:', mpData.id, mpData.status);
+          } catch (mpErr) {
+            console.error('Error MP:', mpErr);
+          }
+        }
       }
     }
 
