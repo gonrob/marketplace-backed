@@ -9,21 +9,7 @@ exports.getSellers = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener anfitriones.' });
   }
 };
-exports.updateProfile = async (req, res) => {
-  try {
-    const { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago } = req.body;
-    const update = { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago };
-    // No sobreescribir la foto si no viene en el body
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { $set: update },
-      { new: true }
-    );
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar perfil.' });
-  }
-};
+
 exports.getSellerById = async (req, res) => {
   try {
     const seller = await User.findById(req.params.id)
@@ -35,6 +21,26 @@ exports.getSellerById = async (req, res) => {
   }
 };
 
+exports.updateProfile = async (req, res) => {
+  try {
+    const { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago } = req.body;
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado.' });
+    if (nombre !== undefined) user.nombre = nombre;
+    if (bio !== undefined) user.bio = bio;
+    if (precio !== undefined) user.precio = precio;
+    if (habilidades !== undefined) user.habilidades = habilidades;
+    if (ciudad !== undefined) user.ciudad = ciudad;
+    if (disponible !== undefined) user.disponible = disponible;
+    if (metodoPago !== undefined) user.metodoPago = metodoPago;
+    if (cuentaPago !== undefined) user.cuentaPago = cuentaPago;
+    await user.save({ validateBeforeSave: false });
+    res.json(user);
+  } catch (err) {
+    console.error('updateProfile:', err.message);
+    res.status(500).json({ error: 'Error al actualizar perfil.' });
+  }
+};
 
 exports.deleteAccount = async (req, res) => {
   try {
