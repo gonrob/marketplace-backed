@@ -11,6 +11,20 @@ app.use(cors({
 }));
 
 app.use('/webhook', express.raw({ type: 'application/json' }), require('./routes/webhookRoutes'));
+app.use('/didit-webhook', express.json(), async (req, res) => {
+  try {
+    const { status, vendor_data } = req.body;
+    if (status === 'Approved' && vendor_data) {
+      await require('./models/User').findByIdAndUpdate(vendor_data, { verificado: true });
+      console.log('Usuario verificado:', vendor_data);
+    }
+    res.json({ received: true });
+  } catch (err) {
+    console.error('Error didit webhook:', err);
+    res.status(500).json({ error: 'Error' });
+  }
+});
+
 app.use(express.json());
 
 app.use('/api/auth',   require('./routes/authRoutes'));

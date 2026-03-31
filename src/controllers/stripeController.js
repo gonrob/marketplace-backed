@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const diditService = require('../services/diditService');
 
 function stripe() {
   return require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -86,18 +87,13 @@ exports.createPayment = async (req, res) => {
 exports.createVerification = async (req, res) => {
   try {
     const user = req.user;
-    const session = await stripe().identity.verificationSessions.create({
-      type: 'document',
-      metadata: { userId: user._id.toString() },
-      options: {
-        document: {
-          allowed_types: ['id_card', 'passport', 'driving_license'],
-          require_live_capture: true,
-          require_matching_selfie: true
-        }
-      },
-      return_url: `${process.env.CLIENT_URL}/dashboard?verified=true`
-    });
+    const session = await diditService.createVerificationSession(
+      user._id.toString(),
+      user.email
+    );
+    if (!session || !session.url) {
+      return res.status(500).json({ error: 'Error al crear sesion de verificacion.' });
+    }
     res.json({ url: session.url });
   } catch (err) {
     console.error(err);
