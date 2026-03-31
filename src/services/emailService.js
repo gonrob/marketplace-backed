@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 exports.emailBienvenidaAnfitrion = async (email, nombre) => {
   try {
     await resend.emails.send({
-      from: 'Argentalk <argentalk26@gmail.com>',
+      from: 'Argentalk <onboarding@resend.dev>',
       to: email,
       subject: '¡Bienvenido a Argentalk! 🧉',
       html: `
@@ -19,7 +19,7 @@ exports.emailBienvenidaAnfitrion = async (email, nombre) => {
             <ul style="color:#555;margin-top:8px;padding-left:20px">
               <li>Completa tu perfil con tus habilidades y precio</li>
               <li>Conecta tu cuenta de Stripe para recibir pagos</li>
-              <li>Verificá tu identidad con DNI o Pasaporte</li>
+              <li>Verifica tu identidad con DNI o Pasaporte</li>
             </ul>
           </div>
           <div style="text-align:center;margin-top:24px">
@@ -39,7 +39,7 @@ exports.emailBienvenidaAnfitrion = async (email, nombre) => {
 exports.emailBienvenidaViajero = async (email, nombre) => {
   try {
     await resend.emails.send({
-      from: 'Argentalk <argentalk26@gmail.com>',
+      from: 'Argentalk <onboarding@resend.dev>',
       to: email,
       subject: 'Welcome to Argentalk! 🧉',
       html: `
