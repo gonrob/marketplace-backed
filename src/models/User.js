@@ -18,7 +18,9 @@ const userSchema = new mongoose.Schema({
   telefono:           { type: String, default: '' },
   pais:               { type: String, default: '' },
   metodoPago:         { type: String, default: '' },
-  cuentaPago:         { type: String, default: '' }
+  cuentaPago:         { type: String, default: '' },
+  ganancias:          { type: Number, default: 0 },
+  totalContactos:     { type: Number, default: 0 },
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {
