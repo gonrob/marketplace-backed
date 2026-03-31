@@ -26,11 +26,12 @@ app.use('/didit-webhook', express.json(), async (req, res) => {
   }
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/auth',   require('./routes/authRoutes'));
 app.use('/api/users',  require('./routes/userRoutes'));
 app.use('/api/stripe', require('./routes/stripeRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use((err, req, res, next) => {
