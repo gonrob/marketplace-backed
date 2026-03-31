@@ -19,11 +19,16 @@ router.post('/photo', auth, async (req, res) => {
       transformation: [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }]
     });
 
+    console.log('Cloudinary URL:', result.secure_url);
+    console.log('Usuario ID:', req.user._id);
+
     const user = await User.findByIdAndUpdate(
       req.user._id,
       { foto: result.secure_url },
       { new: true }
     );
+
+    console.log('Usuario foto guardada:', user.foto);
 
     res.json({ url: result.secure_url, user });
   } catch (err) {
