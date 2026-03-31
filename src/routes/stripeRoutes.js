@@ -9,8 +9,3 @@ router.post('/pay',             auth, ctrl.createPayment);
 router.post('/verify/identity', auth, ctrl.createVerification);
 
 module.exports = router;
-```
-
-Guarda con **CMD + S**. Ahora abrí el server.js:
-```
-open -a TextEdit src/server.js
