@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { emailBienvenidaAnfitrion, emailBienvenidaViajero } = require('../services/emailService');
 
 const token = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
@@ -19,6 +20,13 @@ exports.register = async (req, res) => {
       metodoPago: metodoPago || '',
       cuentaPago: cuentaPago || ''
     });
+
+    if (role === 'seller') {
+      emailBienvenidaAnfitrion(email, nombre);
+    } else {
+      emailBienvenidaViajero(email, nombre);
+    }
+
     res.status(201).json({ token: token(user._id), user });
   } catch (err) {
     console.error(err);
