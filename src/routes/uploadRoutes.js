@@ -20,15 +20,14 @@ router.post('/photo', auth, async (req, res) => {
     });
 
     console.log('Cloudinary URL:', result.secure_url);
-    console.log('Usuario ID:', req.user._id);
 
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { foto: result.secure_url },
-      { new: true }
+    await User.updateOne(
+      { _id: req.user._id },
+      { $set: { foto: result.secure_url } }
     );
 
-    console.log('Usuario foto guardada:', user.foto);
+    const user = await User.findById(req.user._id);
+    console.log('Foto en DB:', user.foto);
 
     res.json({ url: result.secure_url, user });
   } catch (err) {
