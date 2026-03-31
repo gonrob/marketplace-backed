@@ -9,7 +9,21 @@ exports.getSellers = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener anfitriones.' });
   }
 };
-
+exports.updateProfile = async (req, res) => {
+  try {
+    const { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago } = req.body;
+    const update = { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago };
+    // No sobreescribir la foto si no viene en el body
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: update },
+      { new: true }
+    );
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al actualizar perfil.' });
+  }
+};
 exports.getSellerById = async (req, res) => {
   try {
     const seller = await User.findById(req.params.id)
@@ -21,19 +35,6 @@ exports.getSellerById = async (req, res) => {
   }
 };
 
-exports.updateProfile = async (req, res) => {
-  try {
-    const { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago } = req.body;
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago },
-      { new: true }
-    );
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ error: 'Error al actualizar perfil.' });
-  }
-};
 
 exports.deleteAccount = async (req, res) => {
   try {
