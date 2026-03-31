@@ -65,7 +65,7 @@ exports.createPayment = async (req, res) => {
   try {
     const { amount, sellerUserId } = req.body;
     if (!amount || !sellerUserId) return res.status(400).json({ error: 'Faltan datos.' });
-    if (amount < 50) return res.status(400).json({ error: 'Minimo 0.50 USD.' });
+    if (amount < 200) return res.status(400).json({ error: 'Minimo 0.50 USD.' });
     const seller = await User.findById(sellerUserId);
     if (!seller || !seller.stripeAccountId) return res.status(404).json({ error: 'Anfitrion no encontrado.' });
     if (!seller.onboardingComplete) return res.status(400).json({ error: 'El anfitrion no completo Stripe.' });
