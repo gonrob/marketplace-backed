@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   verificado:         { type: Boolean, default: false },
   nombre:             { type: String, default: '' },
   bio:                { type: String, default: '' },
+  foto:               { type: String, default: '' },
   precio:             { type: Number, default: 10 },
   habilidades:        { type: [String], default: [] },
   ciudad:             { type: String, default: '' },
