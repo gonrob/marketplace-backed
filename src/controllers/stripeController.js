@@ -14,7 +14,7 @@ exports.getStatus = async (req, res) => {
 
 exports.createPayment = async (req, res) => {
   try {
-    const { amount, sellerUserId } = req.body;
+    const { amount, sellerUserId, buyerEmail } = req.body;
     if (!amount || !sellerUserId) return res.status(400).json({ error: 'Faltan datos.' });
     if (amount < 200) return res.status(400).json({ error: 'Minimo USD 2.' });
 
@@ -29,8 +29,10 @@ exports.createPayment = async (req, res) => {
         sellerUserId: sellerUserId,
         sellerEmail: seller.email,
         sellerNombre: seller.nombre || '',
+        sellerTelefono: seller.telefono || '',
         sellerMetodoPago: seller.metodoPago || '',
         sellerCuentaPago: seller.cuentaPago || '',
+        buyerEmail: buyerEmail || '',
       }
     });
     res.json({ clientSecret: intent.client_secret });
