@@ -13,24 +13,20 @@ exports.handleWebhook = async (req, res) => {
   }
 
   try {
-    if (event.type === 'account.updated') {
-      const account = event.data.object;
-      if (account.details_submitted && account.charges_enabled) {
-        await User.findOneAndUpdate({ stripeAccountId: account.id }, { onboardingComplete: true });
-        console.log('Onboarding completado:', account.id);
-      }
-    }
-
     if (event.type === 'payment_intent.succeeded') {
       const intent = event.data.object;
-      const sellerAccountId = intent.transfer_data?.destination;
-      if (sellerAccountId) {
-        const ganancias = Math.floor(intent.amount * 0.85) / 100;
-        const seller = await User.findOneAndUpdate(
-          { stripeAccountId: sellerAccountId },
+      const sellerUserId = intent.metadata?.sellerUserId;
+
+      if (sellerUserId) {
+        const totalCents = intent.amount;
+        const ganancias = Math.floor(totalCents * 0.85) / 100;
+
+        const seller = await User.findByIdAndUpdate(
+          sellerUserId,
           { $inc: { ganancias, totalContactos: 1 } },
           { new: true }
         );
+
         console.log('Pago procesado para:', seller?.email, 'Ganancias:', ganancias);
 
         if (seller && seller.cuentaPago && seller.metodoPago === 'mercadopago' && process.env.MP_ACCESS_TOKEN) {
@@ -57,6 +53,12 @@ exports.handleWebhook = async (req, res) => {
           }
         }
       }
+    }
+
+    if (event.type === 'identity.verification_session.verified') {
+      const session = event.data.object;
+      const userId = session.metadata?.userId;
+      if (userId) await User.findByIdAndUpdate(userId, { verificado: true });
     }
 
     res.json({ received: true });
