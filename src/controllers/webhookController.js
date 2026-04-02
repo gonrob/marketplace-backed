@@ -17,24 +17,59 @@ exports.handleWebhook = async (req, res) => {
   try {
     if (event.type === 'payment_intent.succeeded') {
       const intent = event.data.object;
-      const sellerUserId = intent.metadata?.sellerUserId;
+      const tipo = intent.metadata?.tipo;
 
-      if (sellerUserId) {
-        const totalCents = intent.amount;
-        const ganancias = Math.floor(totalCents * 0.85) / 100;
-        const total = totalCents / 100;
+      // Paquete de contactos
+      if (tipo === 'paquete') {
+        const buyerUserId = intent.metadata?.buyerUserId;
+        const creditos = parseInt(intent.metadata?.creditos || 0);
+        if (buyerUserId && creditos > 0) {
+          await User.findByIdAndUpdate(buyerUserId, {
+            $inc: { creditosContacto: creditos }
+          });
+          const buyer = await User.findById(buyerUserId);
+          if (buyer?.email) {
+            await resend.emails.send({
+              from: 'Argentalk <onboarding@resend.dev>',
+              to: buyer.email,
+              subject: '✅ Paquete de contactos activado!',
+              html: `
+                <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
+                  <div style="background:#003DA5;padding:20px;border-radius:12px;text-align:center;margin-bottom:20px">
+                    <h1 style="color:white;margin:0">Argen<span style="color:#F4A020">talk</span> 🧉</h1>
+                  </div>
+                  <h2>Paquete activado!</h2>
+                  <p>Tenes <strong>${creditos} contactos</strong> disponibles.</p>
+                  <p>Usalos cuando quieras en <a href="https://argentalk.vercel.app/explorar">argentalk.vercel.app</a></p>
+                </div>
+              `
+            });
+          }
+        }
+      }
 
-        const seller = await User.findByIdAndUpdate(
-          sellerUserId,
-          { $inc: { ganancias, totalContactos: 1 } },
-          { new: true }
-        );
+      // Contacto individual 0.50 USD
+      if (tipo === 'contacto') {
+        const sellerUserId = intent.metadata?.sellerUserId;
+        const buyerUserId = intent.metadata?.buyerUserId;
+        const buyerEmail = intent.metadata?.buyerEmail;
 
-        console.log('Pago procesado para:', seller?.email, 'Ganancias:', ganancias);
+        if (sellerUserId) {
+          const ganancias = 0.35; // 70% de 0.50
+          const seller = await User.findByIdAndUpdate(
+            sellerUserId,
+            { $inc: { ganancias, totalContactos: 1 } },
+            { new: true }
+          );
 
-        // Email al anfitrion
-        if (seller?.email) {
-          try {
+          if (buyerUserId) {
+            await User.findByIdAndUpdate(buyerUserId, {
+              $push: { anfitrionesContactados: sellerUserId }
+            });
+          }
+
+          // Email al anfitrion
+          if (seller?.email) {
             await resend.emails.send({
               from: 'Argentalk <onboarding@resend.dev>',
               to: seller.email,
@@ -45,60 +80,45 @@ exports.handleWebhook = async (req, res) => {
                     <h1 style="color:white;margin:0">Argen<span style="color:#F4A020">talk</span> 🧉</h1>
                   </div>
                   <h2>Hola ${seller.nombre || 'anfitrion'}!</h2>
-                  <p style="color:#555">Alguien pago tu primer contacto por <strong>USD ${total}</strong>.</p>
-                  <p style="color:#555">Vos recibis <strong>USD ${ganancias}</strong> (85%).</p>
-                  <div style="background:#f0f4ff;border-radius:10px;padding:16px;margin:16px 0">
-                    <p style="margin:0;color:#003DA5;font-weight:600">El viajero te contactara pronto.</p>
-                    <p style="margin:8px 0 0;color:#555;font-size:14px">Asegurate de tener tu WhatsApp o email disponible para responder.</p>
-                  </div>
+                  <p>Alguien pago USD 0.50 para contactarte.</p>
+                  <p>Vos recibis <strong>USD 0.35</strong> (70%).</p>
                   <div style="text-align:center;margin-top:20px">
                     <a href="https://argentalk.vercel.app/dashboard" style="background:#F4A020;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600">Ver mi dashboard</a>
                   </div>
                 </div>
               `
-            });
-          } catch (emailErr) {
-            console.error('Email anfitrion error:', emailErr.message);
+            }).catch(e => console.error('Email anfitrion:', e.message));
           }
-        }
 
-        // Email al viajero con datos del anfitrion
-        const buyerEmail = intent.receipt_email || intent.metadata?.buyerEmail;
-        if (buyerEmail && seller) {
-          try {
+          // Email al viajero
+          if (buyerEmail && seller) {
             await resend.emails.send({
               from: 'Argentalk <onboarding@resend.dev>',
               to: buyerEmail,
-              subject: '✅ Pago confirmado - Datos de tu anfitrion',
+              subject: '✅ Contacto confirmado - Datos de tu anfitrion',
               html: `
                 <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
                   <div style="background:#003DA5;padding:20px;border-radius:12px;text-align:center;margin-bottom:20px">
                     <h1 style="color:white;margin:0">Argen<span style="color:#F4A020">talk</span> 🧉</h1>
                   </div>
-                  <h2>Pago confirmado!</h2>
-                  <p style="color:#555">Tu pago de <strong>USD ${total}</strong> fue procesado correctamente.</p>
+                  <h2>Contacto confirmado!</h2>
                   <div style="background:#f0f4ff;border-radius:10px;padding:16px;margin:16px 0">
                     <p style="margin:0;font-weight:600;color:#003DA5">Datos de tu anfitrion:</p>
-                    <p style="margin:8px 0 0;color:#555"><strong>Nombre:</strong> ${seller.nombre || 'Sin nombre'}</p>
-                    <p style="margin:4px 0;color:#555"><strong>Email:</strong> ${seller.email}</p>
-                    ${seller.telefono ? `<p style="margin:4px 0;color:#555"><strong>Telefono/WhatsApp:</strong> ${seller.telefono}</p>` : ''}
-                    <p style="margin:8px 0 0;color:#888;font-size:13px">Contactalo directamente para coordinar.</p>
+                    <p style="margin:8px 0 0"><strong>Nombre:</strong> ${seller.nombre || 'Sin nombre'}</p>
+                    <p style="margin:4px 0"><strong>Email:</strong> ${seller.email}</p>
+                    ${seller.telefono ? `<p style="margin:4px 0"><strong>WhatsApp:</strong> ${seller.telefono}</p>` : ''}
                   </div>
                   <div style="text-align:center;margin-top:20px">
                     <a href="https://argentalk.vercel.app/explorar" style="background:#F4A020;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600">Ver mas anfitriones</a>
                   </div>
                 </div>
               `
-            });
-          } catch (emailErr) {
-            console.error('Email viajero error:', emailErr.message);
+            }).catch(e => console.error('Email viajero:', e.message));
           }
-        }
 
-        // Pago automatico por Mercado Pago
-        if (seller && seller.cuentaPago && seller.metodoPago === 'mercadopago' && process.env.MP_ACCESS_TOKEN) {
-          try {
-            const mpRes = await fetch('https://api.mercadopago.com/v1/payments', {
+          // Pago MP si tiene cuenta
+          if (seller?.cuentaPago && seller?.metodoPago === 'mercadopago' && process.env.MP_ACCESS_TOKEN) {
+            fetch('https://api.mercadopago.com/v1/payments', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -106,17 +126,13 @@ exports.handleWebhook = async (req, res) => {
                 'X-Idempotency-Key': intent.id
               },
               body: JSON.stringify({
-                transaction_amount: ganancias,
+                transaction_amount: 0.35,
                 currency_id: 'USD',
-                description: `Argentalk - Contacto #${seller.totalContactos}`,
+                description: 'Argentalk contacto',
                 payment_method_id: 'account_money',
                 payer: { email: seller.cuentaPago }
               })
-            });
-            const mpData = await mpRes.json();
-            console.log('MP pago:', mpData.id, mpData.status);
-          } catch (mpErr) {
-            console.error('MP error:', mpErr.message);
+            }).catch(e => console.error('MP error:', e.message));
           }
         }
       }
