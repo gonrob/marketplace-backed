@@ -3,7 +3,7 @@ const User = require('../models/User');
 exports.getSellers = async (req, res) => {
   try {
     const sellers = await User.find({ role: 'seller', disponible: true })
-      .select('email nombre bio foto precio habilidades ciudad disponible verificado _id');
+      .select('email nombre bio foto precio habilidades ciudad disponible verificado ganancias totalContactos puntuacion valoraciones _id');
     res.json(sellers);
   } catch (err) {
     res.status(500).json({ error: 'Error al obtener anfitriones.' });
@@ -13,7 +13,7 @@ exports.getSellers = async (req, res) => {
 exports.getSellerById = async (req, res) => {
   try {
     const seller = await User.findById(req.params.id)
-      .select('email nombre bio foto precio habilidades ciudad disponible verificado');
+      .select('email nombre bio foto precio habilidades ciudad disponible verificado puntuacion valoraciones');
     if (!seller) return res.status(404).json({ error: 'Anfitrion no encontrado.' });
     res.json(seller);
   } catch (err) {
@@ -49,5 +49,26 @@ exports.deleteAccount = async (req, res) => {
   } catch (err) {
     console.error('deleteAccount:', err.message);
     res.status(500).json({ error: 'Error al eliminar cuenta.' });
+  }
+};
+
+exports.valorar = async (req, res) => {
+  try {
+    const { puntos } = req.body;
+    if (!puntos || puntos < 1 || puntos > 5) {
+      return res.status(400).json({ error: 'Puntuacion debe ser entre 1 y 5.' });
+    }
+    const seller = await User.findById(req.params.id);
+    if (!seller) return res.status(404).json({ error: 'Anfitrion no encontrado.' });
+
+    seller.valoraciones.push(puntos);
+    const total = seller.valoraciones.reduce((a, b) => a + b, 0);
+    seller.puntuacion = Math.round((total / seller.valoraciones.length) * 10) / 10;
+    await seller.save({ validateBeforeSave: false });
+
+    res.json({ puntuacion: seller.puntuacion, total: seller.valoraciones.length });
+  } catch (err) {
+    console.error('valorar:', err.message);
+    res.status(500).json({ error: 'Error al valorar.' });
   }
 };

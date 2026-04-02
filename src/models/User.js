@@ -20,6 +20,8 @@ const userSchema = new mongoose.Schema({
   metodoPago:         { type: String, default: '' },
   cuentaPago:         { type: String, default: '' },
   ganancias:          { type: Number, default: 0 },
+  valoraciones:       { type: [Number], default: [] },
+  puntuacion:         { type: Number, default: 0 },
   totalContactos:     { type: Number, default: 0 },
 }, { timestamps: true });
 
