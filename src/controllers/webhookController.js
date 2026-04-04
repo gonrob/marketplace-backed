@@ -30,7 +30,7 @@ exports.handleWebhook = async (req, res) => {
           const buyer = await User.findById(buyerUserId);
           if (buyer?.email) {
             await resend.emails.send({
-              from: 'Argentalk <onboarding@resend.dev>',
+              from: 'Knowan <onboarding@resend.dev>',
               to: buyer.email,
               subject: '✅ Paquete de contactos activado!',
               html: `
@@ -40,7 +40,7 @@ exports.handleWebhook = async (req, res) => {
                   </div>
                   <h2>Paquete activado!</h2>
                   <p>Tenes <strong>${creditos} contactos</strong> disponibles.</p>
-                  <p>Usalos cuando quieras en <a href="https://argentalk.vercel.app/explorar">argentalk.vercel.app</a></p>
+                  <p>Usalos cuando quieras en <a href="https://knowan.net/explorar">knowan.net</a></p>
                 </div>
               `
             });
@@ -71,9 +71,9 @@ exports.handleWebhook = async (req, res) => {
           // Email al anfitrion
           if (seller?.email) {
             await resend.emails.send({
-              from: 'Argentalk <onboarding@resend.dev>',
+              from: 'Knowan <onboarding@resend.dev>',
               to: seller.email,
-              subject: '🎉 Nuevo contacto en Argentalk!',
+              subject: '🎉 Nuevo contacto en Knowan!',
               html: `
                 <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
                   <div style="background:#003DA5;padding:20px;border-radius:12px;text-align:center;margin-bottom:20px">
@@ -83,7 +83,7 @@ exports.handleWebhook = async (req, res) => {
                   <p>Alguien pago USD 0.50 para contactarte.</p>
                   <p>Vos recibis <strong>USD 0.35</strong> (70%).</p>
                   <div style="text-align:center;margin-top:20px">
-                    <a href="https://argentalk.vercel.app/dashboard" style="background:#F4A020;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600">Ver mi dashboard</a>
+                    <a href="https://knowan.net/dashboard" style="background:#F4A020;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600">Ver mi dashboard</a>
                   </div>
                 </div>
               `
@@ -93,7 +93,7 @@ exports.handleWebhook = async (req, res) => {
           // Email al viajero
           if (buyerEmail && seller) {
             await resend.emails.send({
-              from: 'Argentalk <onboarding@resend.dev>',
+              from: 'Knowan <onboarding@resend.dev>',
               to: buyerEmail,
               subject: '✅ Contacto confirmado - Datos de tu anfitrion',
               html: `
@@ -109,7 +109,7 @@ exports.handleWebhook = async (req, res) => {
                     ${seller.telefono ? `<p style="margin:4px 0"><strong>WhatsApp:</strong> ${seller.telefono}</p>` : ''}
                   </div>
                   <div style="text-align:center;margin-top:20px">
-                    <a href="https://argentalk.vercel.app/explorar" style="background:#F4A020;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600">Ver mas anfitriones</a>
+                    <a href="https://knowan.net/explorar" style="background:#F4A020;color:white;padding:12px 24px;border-radius:10px;text-decoration:none;font-weight:600">Ver mas anfitriones</a>
                   </div>
                 </div>
               `
@@ -128,7 +128,7 @@ exports.handleWebhook = async (req, res) => {
               body: JSON.stringify({
                 transaction_amount: 0.35,
                 currency_id: 'USD',
-                description: 'Argentalk contacto',
+                description: 'Knowan contacto',
                 payment_method_id: 'account_money',
                 payer: { email: seller.cuentaPago }
               })

@@ -1,15 +1,15 @@
 const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM = 'Argentalk <onboarding@resend.dev>';
-const URL = 'https://argentalk.vercel.app';
+const FROM = 'Knowan <onboarding@resend.dev>';
+const URL = 'https://knowan.net';
 
 exports.emailAnfitrion = async (email, nombre) => {
   try {
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: '¡Bienvenido a Argentalk! 🧉',
+      subject: '¡Bienvenido a Knowan! 🧉',
       html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
         <div style="background:#003DA5;padding:24px;border-radius:12px;text-align:center;margin-bottom:20px">
           <h1 style="color:white;margin:0">Argen<span style="color:#F4A020">talk</span> 🧉</h1>
@@ -36,13 +36,13 @@ exports.emailViajero = async (email, nombre) => {
     await resend.emails.send({
       from: FROM,
       to: email,
-      subject: 'Welcome to Argentalk! 🧉',
+      subject: 'Welcome to Knowan! 🧉',
       html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
         <div style="background:#003DA5;padding:24px;border-radius:12px;text-align:center;margin-bottom:20px">
           <h1 style="color:white;margin:0">Argen<span style="color:#F4A020">talk</span> 🧉</h1>
         </div>
         <h2>Welcome ${nombre || ''}!</h2>
-        <p style="color:#555;line-height:1.6">Your Argentalk account is ready. Start connecting with real Argentinians!</p>
+        <p style="color:#555;line-height:1.6">Your Knowan account is ready. Start connecting with real Argentinians!</p>
         <div style="text-align:center;margin-top:24px">
           <a href="${URL}/explorar" style="background:#F4A020;color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:600">Find a host</a>
         </div>

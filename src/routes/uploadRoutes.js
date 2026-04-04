@@ -15,7 +15,7 @@ router.post('/photo', auth, async (req, res) => {
     if (!photo) return res.status(400).json({ error: 'Foto requerida.' });
 
     const result = await cloudinary.uploader.upload(photo, {
-      folder: 'argentalk',
+      folder: 'knowan',
       transformation: [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }]
     });
 
