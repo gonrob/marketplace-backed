@@ -52,6 +52,16 @@ exports.deleteAccount = async (req, res) => {
   }
 };
 
+exports.deleteAccountAdmin = async (req, res) => {
+  try {
+    if (req.user.email !== 'gonrobtor@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Cuenta eliminada.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al eliminar.' });
+  }
+};
+
 exports.valorar = async (req, res) => {
   try {
     const { puntos } = req.body;
@@ -60,12 +70,10 @@ exports.valorar = async (req, res) => {
     }
     const seller = await User.findById(req.params.id);
     if (!seller) return res.status(404).json({ error: 'Anfitrion no encontrado.' });
-
     seller.valoraciones.push(puntos);
     const total = seller.valoraciones.reduce((a, b) => a + b, 0);
     seller.puntuacion = Math.round((total / seller.valoraciones.length) * 10) / 10;
     await seller.save({ validateBeforeSave: false });
-
     res.json({ puntuacion: seller.puntuacion, total: seller.valoraciones.length });
   } catch (err) {
     console.error('valorar:', err.message);
