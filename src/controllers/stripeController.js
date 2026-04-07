@@ -43,7 +43,7 @@ exports.createPayment = async (req, res) => {
         $push: { anfitrionesContactados: sellerUserId }
       });
       await User.findByIdAndUpdate(sellerUserId, {
-        $inc: { totalContactos: 1, ganancias: 0.35 }
+        $inc: { totalContactos: 1, ganancias: 0.25 }
       });
       return res.json({ credito: true, sellerId: sellerUserId });
     }
