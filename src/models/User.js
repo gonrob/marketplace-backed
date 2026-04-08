@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema({
   password:         { type: String, required: true },
   role:             { type: String, enum: ['seller', 'buyer'], default: 'buyer' },
   verificado:       { type: Boolean, default: false },
+  emailVerificado:  { type: Boolean, default: false },
+  tokenEmail:       { type: String, default: null },
   nombre:           { type: String, default: '' },
   bio:              { type: String, default: '' },
   foto:             { type: String, default: '' },
