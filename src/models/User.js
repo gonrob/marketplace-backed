@@ -7,6 +7,8 @@ const userSchema = new mongoose.Schema({
   role:             { type: String, enum: ['seller', 'buyer'], default: 'buyer' },
   verificado:       { type: Boolean, default: false },
   emailVerificado:  { type: Boolean, default: false },
+  nombrePareja:     { type: String, default: null },
+  esPareja:         { type: Boolean, default: false },
   tokenEmail:       { type: String, default: null },
   nombre:           { type: String, default: '' },
   bio:              { type: String, default: '' },
