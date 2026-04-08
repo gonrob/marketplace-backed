@@ -14,7 +14,8 @@ router.get('/', async (req, res) => {
     const { categoria } = req.query;
     const cat = CATEGORIAS_MAP[categoria] || 'concerts,sports,community,festivals,performing-arts,expos,food-drink';
     const hoy = new Date().toISOString().split('T')[0];
-    const url = `https://api.predicthq.com/v1/events/?country=AR&limit=20&sort=start&category=${cat}&start.gte=${hoy}`;
+    const catEncoded = encodeURIComponent(cat);
+    const url = `https://api.predicthq.com/v1/events/?country=AR&limit=20&sort=start&category=${catEncoded}&start.gte=${hoy}`;
 
     const r = await fetch(url, {
       headers: {
