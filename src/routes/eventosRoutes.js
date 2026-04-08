@@ -4,7 +4,7 @@ const CATEGORIAS_MAP = {
   musica: ['concerts'],
   deportes: ['sports'],
   fiestas: ['community', 'festivals'],
-  cultura: ['performing-arts', 'expos'],
+  cultura: ['performing-arts', 'expos', 'conferences'],
   gastronomia: ['food-drink'],
   todos: ['concerts', 'sports', 'community', 'festivals', 'performing-arts'],
 };
@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
     const hoy = new Date().toISOString().split('T')[0];
 
     const resultados = await Promise.all(cats.map(async (cat) => {
-      const url = `https://api.predicthq.com/v1/events/?country=AR&limit=5&sort=start&category=${cat}&start.gte=${hoy}`;
+      const url = `https://api.predicthq.com/v1/events/?country=AR&limit=20&sort=rank&category=${cat}&start.gte=${hoy}&rank.gte=60`;
       const r = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${process.env.PREDICTHQ_TOKEN}`,
@@ -27,7 +27,9 @@ router.get('/', async (req, res) => {
       return data.results || [];
     }));
 
-    const todos = resultados.flat().sort((a, b) => new Date(a.start_local) - new Date(b.start_local));
+    const todos = resultados.flat()
+      .sort((a, b) => b.rank - a.rank)
+      .slice(0, 50);
 
     const eventos = todos.map(e => ({
       id: e.id,
