@@ -23,7 +23,7 @@ exports.getSellerById = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago, foto } = req.body;
+    const { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago, foto, foto2, nombrePareja } = req.body;
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: 'Usuario no encontrado.' });
     if (nombre !== undefined) user.nombre = nombre;
@@ -35,6 +35,8 @@ exports.updateProfile = async (req, res) => {
     if (metodoPago !== undefined) user.metodoPago = metodoPago;
     if (cuentaPago !== undefined) user.cuentaPago = cuentaPago;
     if (foto !== undefined) user.foto = foto;
+    if (foto2 !== undefined) user.foto2 = foto2;
+    if (nombrePareja !== undefined) user.nombrePareja = nombrePareja;
     await user.save({ validateBeforeSave: false });
     res.json(user);
   } catch (err) {

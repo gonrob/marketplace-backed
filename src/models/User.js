@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   emailVerificado:  { type: Boolean, default: false },
   nombrePareja:     { type: String, default: null },
   esPareja:         { type: Boolean, default: false },
+  foto2:            { type: String, default: null },
   tokenEmail:       { type: String, default: null },
   nombre:           { type: String, default: '' },
   bio:              { type: String, default: '' },
