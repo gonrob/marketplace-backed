@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   nombrePareja:     { type: String, default: null },
   esPareja:         { type: Boolean, default: false },
   foto2:            { type: String, default: null },
+  galeria:          { type: [String], default: [] },
   tokenEmail:       { type: String, default: null },
   nombre:           { type: String, default: '' },
   bio:              { type: String, default: '' },
