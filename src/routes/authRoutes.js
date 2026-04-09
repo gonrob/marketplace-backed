@@ -5,4 +5,6 @@ router.post('/register', ctrl.register);
 router.post('/login', ctrl.login);
 router.get('/me', auth, ctrl.me);
 router.get('/verificar/:token', ctrl.verificarEmail);
+router.post('/forgot-password', ctrl.forgotPassword);
+router.post('/reset-password', ctrl.resetPassword);
 module.exports = router;

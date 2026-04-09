@@ -67,3 +67,47 @@ exports.verificarEmail = async (req, res) => {
     res.status(500).json({ error: 'Error al verificar email.' });
   }
 };
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.json({ message: 'Si el email existe, recibirás un link.' });
+    const token = crypto.randomBytes(32).toString('hex');
+    await User.findByIdAndUpdate(user._id, { tokenEmail: token });
+    const link = `https://knowan.net/reset-password?token=${token}`;
+    const { Resend } = require('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    await resend.emails.send({
+      from: 'Knowan <info@knowan.net>',
+      to: email,
+      subject: 'Resetear contraseña — Knowan',
+      html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
+        <h2>Resetear contraseña</h2>
+        <p>Hacé click en el botón para crear una nueva contraseña:</p>
+        <a href="${link}" style="display:block;background:linear-gradient(90deg,#4B6CB7,#C94B4B);color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;text-align:center;margin:20px 0">🔑 Resetear contraseña</a>
+        <p style="color:#aaa;font-size:12px">Si no pediste esto, ignorá este email.</p>
+      </div>`
+    });
+    res.json({ message: 'Si el email existe, recibirás un link.' });
+  } catch (err) {
+    console.error('forgotPassword error:', err.message);
+    res.status(500).json({ error: 'Error al procesar.' });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!password || password.length < 6) return res.status(400).json({ error: 'Password mínimo 6 caracteres.' });
+    const user = await User.findOne({ tokenEmail: token });
+    if (!user) return res.status(400).json({ error: 'Token inválido o expirado.' });
+    user.password = password;
+    user.tokenEmail = null;
+    await user.save();
+    res.json({ message: 'Contraseña actualizada.' });
+  } catch (err) {
+    console.error('resetPassword error:', err.message);
+    res.status(500).json({ error: 'Error al resetear.' });
+  }
+};
