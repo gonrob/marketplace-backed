@@ -2,7 +2,7 @@ const { Resend } = require('resend');
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM = 'Knowan <info@knowan.net>';
-const URL = 'https://knowan.net';
+const URL = 'https://marketplace-backed-production.up.railway.app';
 
 exports.emailAnfitrion = async (email, nombre, token) => {
   try {
