@@ -56,12 +56,12 @@ exports.verificarEmail = async (req, res) => {
   try {
     const { token } = req.params;
     const user = await User.findOne({ tokenEmail: token });
-    if (!user) return res.status(400).json({ error: 'Token inválido o expirado.' });
+    if (!user) return res.status(400).send('<html><body><h2>Token inválido o ya usado. <a href="https://knowan.net/login">Ir al login</a></h2></body></html>');
     user.emailVerificado = true;
     user.tokenEmail = null;
     await user.save({ validateBeforeSave: false });
     emailBienvenidaVerificado(user.email, user.nombre, user.role);
-    res.send('<html><head><meta http-equiv="refresh" content="0;url=https://knowan.net/login?verified=1"></head><body><p>Email verificado. Iniciá sesión para continuar. <a href="https://knowan.net/login">Click aquí</a></p></body></html>');
+    res.send('<html><head><meta http-equiv="refresh" content="2;url=https://knowan.net/login?verified=1"></head><body><h2>✅ Email verificado. Redirigiendo al login...</h2><p><a href="https://knowan.net/login?verified=1">Click aquí si no redirige</a></p></body></html>');
   } catch (err) {
     console.error('Verificar email error:', err.message);
     res.status(500).json({ error: 'Error al verificar email.' });
@@ -73,9 +73,9 @@ exports.forgotPassword = async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) return res.json({ message: 'Si el email existe, recibirás un link.' });
-    const token = crypto.randomBytes(32).toString('hex');
-    await User.findByIdAndUpdate(user._id, { tokenEmail: token });
-    const link = `https://knowan.net/reset-password?token=${token}`;
+    const tokenReset = crypto.randomBytes(32).toString('hex');
+    await User.findByIdAndUpdate(user._id, { tokenReset });
+    const link = `https://knowan.net/reset-password?token=${tokenReset}`;
     const { Resend } = require('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
@@ -100,10 +100,10 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token, password } = req.body;
     if (!password || password.length < 6) return res.status(400).json({ error: 'Password mínimo 6 caracteres.' });
-    const user = await User.findOne({ tokenEmail: token });
+    const user = await User.findOne({ tokenReset: token });
     if (!user) return res.status(400).json({ error: 'Token inválido o expirado.' });
     user.password = password;
-    user.tokenEmail = null;
+    user.tokenReset = null;
     await user.save();
     res.json({ message: 'Contraseña actualizada.' });
   } catch (err) {
