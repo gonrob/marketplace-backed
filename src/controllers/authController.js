@@ -9,6 +9,8 @@ exports.register = async (req, res) => {
   try {
     const { email, password, role, nombre, telefono, ciudad, pais, metodoPago, cuentaPago, nombrePareja, foto, foto2 } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email y password requeridos.' });
+    if (email.length > 100) return res.status(400).json({ error: 'Email demasiado largo.' });
+    if (nombre && nombre.length > 100) return res.status(400).json({ error: 'Nombre demasiado largo.' });
     if (password.length < 6) return res.status(400).json({ error: 'Password minimo 6 caracteres.' });
     const exists = await User.findOne({ email });
     if (exists) return res.status(409).json({ error: 'Email ya registrado.' });
@@ -41,6 +43,8 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email y password requeridos.' });
+    if (email.length > 100) return res.status(400).json({ error: 'Email demasiado largo.' });
+    if (nombre && nombre.length > 100) return res.status(400).json({ error: 'Nombre demasiado largo.' });
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ error: 'Credenciales incorrectas.' });
     const valid = await user.comparePassword(password);

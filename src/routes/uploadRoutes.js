@@ -9,7 +9,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-router.post('/photo-public', async (req, res) => {
+const rateLimit = require('express-rate-limit');
+const uploadLimiter = rateLimit({ windowMs: 15*60*1000, max: 20, message: { error: 'Demasiadas subidas. Intentá en 15 minutos.' } });
+router.post('/photo-public', uploadLimiter, async (req, res) => {
   try {
     const { photo } = req.body;
     if (!photo) return res.status(400).json({ error: 'Foto requerida.' });
