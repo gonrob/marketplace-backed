@@ -9,6 +9,21 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+router.post('/photo-public', async (req, res) => {
+  try {
+    const { photo } = req.body;
+    if (!photo) return res.status(400).json({ error: 'Foto requerida.' });
+    const result = await cloudinary.uploader.upload(photo, {
+      folder: 'knowan',
+      transformation: [{ width: 400, height: 400, crop: 'fill', gravity: 'face' }]
+    });
+    res.json({ url: result.secure_url });
+  } catch (err) {
+    console.error('Upload public error:', err.message);
+    res.status(500).json({ error: 'Error al subir foto.' });
+  }
+});
+
 router.post('/photo', auth, async (req, res) => {
   try {
     const { photo } = req.body;
