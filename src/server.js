@@ -23,6 +23,7 @@ const io = new Server(server, {
   cors: { origin: ALLOWED_ORIGINS, methods: ['GET', 'POST'] }
 });
 
+app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors({ origin: ALLOWED_ORIGINS, credentials: true }));
 
