@@ -61,7 +61,7 @@ exports.verificarEmail = async (req, res) => {
     user.tokenEmail = null;
     await user.save({ validateBeforeSave: false });
     emailBienvenidaVerificado(user.email, user.nombre, user.role);
-    res.send('<html><head><meta http-equiv="refresh" content="0;url=https://knowan.net/dashboard?verified=email"></head><body><p>Verificando... <a href="https://knowan.net/dashboard">Click aquí si no redirige</a></p></body></html>');
+    res.send('<html><head><meta http-equiv="refresh" content="0;url=https://knowan.net/login?verified=1"></head><body><p>Email verificado. Iniciá sesión para continuar. <a href="https://knowan.net/login">Click aquí</a></p></body></html>');
   } catch (err) {
     console.error('Verificar email error:', err.message);
     res.status(500).json({ error: 'Error al verificar email.' });
