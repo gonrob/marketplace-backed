@@ -7,7 +7,7 @@ const makeToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: 
 
 exports.register = async (req, res) => {
   try {
-    const { email, password, role, nombre, telefono, ciudad, pais, metodoPago, cuentaPago, nombrePareja } = req.body;
+    const { email, password, role, nombre, telefono, ciudad, pais, metodoPago, cuentaPago, nombrePareja, foto, foto2 } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email y password requeridos.' });
     if (password.length < 6) return res.status(400).json({ error: 'Password minimo 6 caracteres.' });
     const exists = await User.findOne({ email });
@@ -24,6 +24,8 @@ exports.register = async (req, res) => {
       cuentaPago: cuentaPago || '',
       nombrePareja: nombrePareja || null,
       esPareja: !!nombrePareja,
+      foto: foto || '',
+      foto2: foto2 || null,
       tokenEmail
     });
     if (role === 'seller') emailAnfitrion(email, nombre, tokenEmail);
