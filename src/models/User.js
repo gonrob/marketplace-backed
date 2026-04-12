@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   bio:              { type: String, default: '' },
   foto:             { type: String, default: '' },
   precio:           { type: Number, default: 10 },
-  habilidades:      { type: [String], default: [] },
+  habilidades:      { type: [mongoose.Schema.Types.Mixed], default: [] },
   ciudad:           { type: String, default: '' },
   disponible:       { type: Boolean, default: true },
   telefono:         { type: String, default: '' },
