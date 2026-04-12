@@ -3,7 +3,7 @@ const User = require('../models/User');
 exports.getSellers = async (req, res) => {
   try {
     const sellers = await User.find({ role: 'seller', disponible: true })
-      .select('email nombre bio foto precio habilidades ciudad disponible verificado ganancias totalContactos puntuacion valoraciones _id');
+      .select('email nombre bio foto foto2 nombrePareja precio habilidades ciudad disponible verificado ganancias totalContactos puntuacion valoraciones idiomas chat videollamada galeria _id');
     res.json(sellers);
   } catch (err) {
     res.status(500).json({ error: 'Error al obtener anfitriones.' });
@@ -23,7 +23,7 @@ exports.getSellerById = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago, foto, foto2, nombrePareja, galeria } = req.body;
+    const { nombre, bio, precio, habilidades, ciudad, disponible, metodoPago, cuentaPago, foto, foto2, nombrePareja, galeria, idiomas, chat, videollamada } = req.body;
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ error: 'Usuario no encontrado.' });
     if (nombre !== undefined) user.nombre = nombre;
@@ -38,6 +38,9 @@ exports.updateProfile = async (req, res) => {
     if (foto2 !== undefined) user.foto2 = foto2;
     if (nombrePareja !== undefined) user.nombrePareja = nombrePareja;
     if (galeria !== undefined) user.galeria = galeria;
+    if (idiomas !== undefined) user.idiomas = idiomas;
+    if (chat !== undefined) user.chat = chat;
+    if (videollamada !== undefined) user.videollamada = videollamada;
     await user.save({ validateBeforeSave: false });
     res.json(user);
   } catch (err) {
@@ -82,5 +85,15 @@ exports.valorar = async (req, res) => {
   } catch (err) {
     console.error('valorar:', err.message);
     res.status(500).json({ error: 'Error al valorar.' });
+  }
+};
+
+exports.getBuyers = async (req, res) => {
+  try {
+    if (req.user.email !== 'gonrobtor@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
+    const buyers = await User.find({ role: 'buyer' }).select('nombre email foto telefono emailVerificado createdAt').sort({ createdAt: -1 });
+    res.json(buyers);
+  } catch (err) {
+    res.status(500).json({ error: 'Error.' });
   }
 };
