@@ -1,5 +1,15 @@
 const router = require('express').Router();
 
+const traducir = async (texto, lang) => {
+  if (!texto || lang === 'es') return texto;
+  try {
+    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=es&tl=${lang}&dt=t&q=${encodeURIComponent(texto)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data[0].map(x => x[0]).join('');
+  } catch { return texto; }
+};
+
 router.get('/', async (req, res) => {
   try {
     const { q, ciudad } = req.query;
@@ -25,6 +35,12 @@ router.get('/', async (req, res) => {
       fuente: 'google',
     }));
 
+    const lang = req.query.lang || 'es';
+    if (lang !== 'es') {
+      for (const e of eventos) {
+        if (e.descripcion) e.descripcion = await traducir(e.descripcion, lang);
+      }
+    }
     res.json(eventos);
   } catch (err) {
     console.error('SerpAPI error:', err.message);
