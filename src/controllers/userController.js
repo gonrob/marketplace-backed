@@ -101,12 +101,14 @@ exports.getBuyers = async (req, res) => {
 exports.emailMasivo = async (req, res) => {
   try {
     if (req.user.email !== 'gonrobtor@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
-    const { asunto, mensaje, role } = req.body;
+    const { asunto, mensaje, role, emailIndividual } = req.body;
     if (!asunto || !mensaje) return res.status(400).json({ error: 'Asunto y mensaje requeridos.' });
     const User = require('../models/User');
     const { Resend } = require('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const users = await User.find({ role: role || 'seller', emailVerificado: true }).select('email nombre');
+    const users = emailIndividual 
+      ? await User.find({ email: emailIndividual }).select('email nombre')
+      : await User.find({ role: role || 'seller', emailVerificado: true }).select('email nombre');
     let enviados = 0;
     for (const u of users) {
       try {
