@@ -66,6 +66,7 @@ app.use('/api/stripe', require('./routes/stripeRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/eventos', require('./routes/eventosRoutes'));
 app.use('/api/mensajes', require('./routes/mensajesRoutes'));
+app.use('/api/tickets', require('./routes/ticketsRoutes'));
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
 const usuarios = {};
