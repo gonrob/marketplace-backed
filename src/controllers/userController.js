@@ -61,7 +61,7 @@ exports.deleteAccount = async (req, res) => {
 
 exports.deleteAccountAdmin = async (req, res) => {
   try {
-    if (req.user.email !== 'gonrobtor@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
+    if (req.user.email !== 'info.knowan@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: 'Cuenta eliminada.' });
   } catch (err) {
@@ -90,7 +90,7 @@ exports.valorar = async (req, res) => {
 
 exports.getBuyers = async (req, res) => {
   try {
-    if (req.user.email !== 'gonrobtor@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
+    if (req.user.email !== 'info.knowan@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
     const buyers = await User.find({ role: 'buyer' }).select('nombre email foto telefono emailVerificado createdAt').sort({ createdAt: -1 });
     res.json(buyers);
   } catch (err) {
@@ -100,7 +100,7 @@ exports.getBuyers = async (req, res) => {
 
 exports.emailMasivo = async (req, res) => {
   try {
-    if (req.user.email !== 'gonrobtor@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
+    if (req.user.email !== 'info.knowan@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
     const { asunto, mensaje, role, emailIndividual } = req.body;
     if (!asunto || !mensaje) return res.status(400).json({ error: 'Asunto y mensaje requeridos.' });
     const User = require('../models/User');

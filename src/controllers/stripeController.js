@@ -119,7 +119,7 @@ exports.retirarGanancias = async (req, res) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
       from: 'Knowan <onboarding@resend.dev>',
-      to: 'gonrobtor@gmail.com',
+      to: 'info.knowan@gmail.com',
       subject: `Solicitud de retiro - ${user.email}`,
       html: `
         <h2>Solicitud de retiro</h2>
