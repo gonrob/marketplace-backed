@@ -9,5 +9,6 @@ router.delete('/account', auth, ctrl.deleteAccount);
 router.delete('/admin/:id', auth, ctrl.deleteAccountAdmin);
 router.post('/sellers/:id/valorar', auth, ctrl.valorar);
 router.get('/buyers', auth, ctrl.getBuyers);
+router.post('/email-masivo', auth, ctrl.emailMasivo);
 
 module.exports = router;

@@ -97,3 +97,37 @@ exports.getBuyers = async (req, res) => {
     res.status(500).json({ error: 'Error.' });
   }
 };
+
+exports.emailMasivo = async (req, res) => {
+  try {
+    if (req.user.email !== 'gonrobtor@gmail.com') return res.status(403).json({ error: 'No autorizado.' });
+    const { asunto, mensaje, role } = req.body;
+    if (!asunto || !mensaje) return res.status(400).json({ error: 'Asunto y mensaje requeridos.' });
+    const User = require('../models/User');
+    const { Resend } = require('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const users = await User.find({ role: role || 'seller', emailVerificado: true }).select('email nombre');
+    let enviados = 0;
+    for (const u of users) {
+      try {
+        await resend.emails.send({
+          from: 'Knowan <info@knowan.net>',
+          to: u.email,
+          subject: asunto,
+          html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
+            <img src="https://res.cloudinary.com/djtsmuzlo/image/upload/v1775331191/Disen%CC%83o_sin_ti%CC%81tulo_l1nog6.png" style="height:60px;margin-bottom:20px" />
+            <p>Hola ${u.nombre},</p>
+            <div style="font-size:15px;line-height:1.6;color:#333">${mensaje}</div>
+            <hr style="margin:24px 0;border:none;border-top:1px solid #eee"/>
+            <p style="font-size:12px;color:#aaa">Knowan · knowan.net · info@knowan.net</p>
+          </div>`
+        });
+        enviados++;
+      } catch {}
+    }
+    res.json({ message: `Email enviado a ${enviados} usuarios.` });
+  } catch (err) {
+    console.error('emailMasivo:', err.message);
+    res.status(500).json({ error: 'Error al enviar emails.' });
+  }
+};
