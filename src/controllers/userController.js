@@ -106,9 +106,12 @@ exports.emailMasivo = async (req, res) => {
     const User = require('../models/User');
     const { Resend } = require('resend');
     const resend = new Resend(process.env.RESEND_API_KEY);
+    const soloNoVerificados = req.body.soloNoVerificados;
     const users = emailIndividual 
       ? await User.find({ email: emailIndividual }).select('email nombre')
-      : await User.find({ role: role || 'seller', emailVerificado: true }).select('email nombre');
+      : soloNoVerificados
+        ? await User.find({ role: role || 'seller', emailVerificado: false }).select('email nombre')
+        : await User.find({ role: role || 'seller', emailVerificado: true }).select('email nombre');
     let enviados = 0;
     for (const u of users) {
       try {
