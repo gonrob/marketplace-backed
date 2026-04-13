@@ -38,6 +38,28 @@ exports.createPayment = async (req, res) => {
         $push: { anfitrionesContactados: sellerUserId }
       });
       await User.findByIdAndUpdate(sellerUserId, { $inc: { totalContactos: 1 } });
+      // Notificar al anfitrion por email
+      try {
+        const { Resend } = require('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+          from: 'KNOWAN <info@knowan.net>',
+          to: seller.email,
+          subject: 'Tienes un nuevo contacto en KNOWAN',
+          html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
+            <h2 style="color:#4B6CB7">Nuevo contacto en KNOWAN</h2>
+            <p>Hola ${seller.nombre},</p>
+            <p><strong>${buyer.nombre}</strong> quiere contactarte en KNOWAN.</p>
+            <div style="background:#f0f4ff;borderRadius:10px;padding:16px;margin:16px 0">
+              <p><strong>Nombre:</strong> ${buyer.nombre}</p>
+              <p><strong>WhatsApp:</strong> ${buyer.telefono || 'No disponible'}</p>
+              <p><strong>Email:</strong> ${buyer.email}</p>
+            </div>
+            <a href="https://knowan.net/mensajes?con=${buyer._id}" style="display:block;background:linear-gradient(90deg,#4B6CB7,#C94B4B);color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;text-align:center;margin:20px 0">Responder en KNOWAN</a>
+            <p style="color:#aaa;font-size:12px">KNOWAN · knowan.net</p>
+          </div>`
+        });
+      } catch(e) { console.error('Email notif error:', e.message); }
       return res.json({ gratis: true, sellerId: sellerUserId });
     }
 
@@ -50,6 +72,28 @@ exports.createPayment = async (req, res) => {
       await User.findByIdAndUpdate(sellerUserId, {
         $inc: { totalContactos: 1, ganancias: 0.25 }
       });
+      // Notificar al anfitrion por email
+      try {
+        const { Resend } = require('resend');
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        await resend.emails.send({
+          from: 'KNOWAN <info@knowan.net>',
+          to: seller.email,
+          subject: 'Tienes un nuevo contacto en KNOWAN',
+          html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px">
+            <h2 style="color:#4B6CB7">Nuevo contacto en KNOWAN</h2>
+            <p>Hola ${seller.nombre},</p>
+            <p><strong>${buyer.nombre}</strong> quiere contactarte en KNOWAN.</p>
+            <div style="background:#f0f4ff;padding:16px;margin:16px 0;border-radius:10px">
+              <p><strong>Nombre:</strong> ${buyer.nombre}</p>
+              <p><strong>WhatsApp:</strong> ${buyer.telefono || 'No disponible'}</p>
+              <p><strong>Email:</strong> ${buyer.email}</p>
+            </div>
+            <a href="https://knowan.net/mensajes?con=${buyer._id}" style="display:block;background:linear-gradient(90deg,#4B6CB7,#C94B4B);color:white;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;text-align:center;margin:20px 0">Responder en KNOWAN</a>
+            <p style="color:#aaa;font-size:12px">KNOWAN · knowan.net</p>
+          </div>`
+        });
+      } catch(e) { console.error('Email notif error:', e.message); }
       return res.json({ credito: true, sellerId: sellerUserId });
     }
 
