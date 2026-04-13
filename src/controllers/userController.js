@@ -111,7 +111,7 @@ exports.emailMasivo = async (req, res) => {
       ? await User.find({ email: emailIndividual }).select('email nombre')
       : soloNoVerificados
         ? await User.find({ role: role || 'seller', emailVerificado: false }).select('email nombre')
-        : await User.find({ role: role || 'seller', emailVerificado: true }).select('email nombre');
+        : await User.find({ role: role || 'seller' }).select('email nombre');
     let enviados = 0;
     for (const u of users) {
       try {
