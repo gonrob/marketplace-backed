@@ -23,6 +23,11 @@ exports.createPayment = async (req, res) => {
     const seller = await User.findById(sellerUserId);
     if (!seller) return res.status(404).json({ error: 'Anfitrion no encontrado.' });
 
+    // Admin saltea todo
+    if (['info.knowan@gmail.com','gonrobtor@gmail.com'].includes(buyer.email)) {
+      return res.json({ gratis: true, sellerId: sellerUserId });
+    }
+
     // Verificar si ya contacto a este anfitrion
     const yaContacto = buyer.anfitrionesContactados.includes(sellerUserId);
 
