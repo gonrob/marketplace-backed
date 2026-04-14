@@ -115,3 +115,20 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ error: 'Error al resetear.' });
   }
 };
+
+exports.reenviarVerificacion = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado.' });
+    if (user.emailVerificado) return res.json({ message: 'Tu email ya está verificado.' });
+    const tokenEmail = require('crypto').randomBytes(32).toString('hex');
+    user.tokenEmail = tokenEmail;
+    await user.save({ validateBeforeSave: false });
+    if (user.role === 'seller') emailAnfitrion(user.email, user.nombre, tokenEmail);
+    else emailViajero(user.email, user.nombre, tokenEmail);
+    res.json({ message: 'Email reenviado.' });
+  } catch (err) {
+    console.error('reenviarVerificacion:', err.message);
+    res.status(500).json({ error: 'Error al reenviar.' });
+  }
+};

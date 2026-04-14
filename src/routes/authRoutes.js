@@ -7,4 +7,5 @@ router.get('/me', auth, ctrl.me);
 router.get('/verificar/:token', ctrl.verificarEmail);
 router.post('/forgot-password', ctrl.forgotPassword);
 router.post('/reset-password', ctrl.resetPassword);
+router.post('/reenviar-verificacion', require('../middleware/auth'), ctrl.reenviarVerificacion);
 module.exports = router;
