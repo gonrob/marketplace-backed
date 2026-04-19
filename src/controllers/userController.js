@@ -136,3 +136,20 @@ exports.emailMasivo = async (req, res) => {
     res.status(500).json({ error: 'Error al enviar emails.' });
   }
 };
+
+exports.cambiarPassword = async (req, res) => {
+  try {
+    const { passwordActual, passwordNueva } = req.body;
+    if (!passwordActual || !passwordNueva) return res.status(400).json({ error: 'Faltan datos.' });
+    if (passwordNueva.length < 6) return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres.' });
+    const user = await require('../models/User').findById(req.user._id);
+    const valid = await user.comparePassword(passwordActual);
+    if (!valid) return res.status(401).json({ error: 'Contraseña actual incorrecta.' });
+    user.password = passwordNueva;
+    await user.save();
+    res.json({ message: 'Contraseña actualizada.' });
+  } catch (err) {
+    console.error('cambiarPassword:', err.message);
+    res.status(500).json({ error: 'Error al cambiar contraseña.' });
+  }
+};

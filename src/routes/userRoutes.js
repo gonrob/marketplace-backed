@@ -8,6 +8,7 @@ router.put('/profile', auth, ctrl.updateProfile);
 router.delete('/account', auth, ctrl.deleteAccount);
 router.delete('/admin/:id', auth, ctrl.deleteAccountAdmin);
 router.post('/sellers/:id/valorar', auth, ctrl.valorar);
+router.put('/cambiar-password', auth, ctrl.cambiarPassword);
 router.get('/buyers', auth, ctrl.getBuyers);
 router.post('/email-masivo', auth, ctrl.emailMasivo);
 
